@@ -12,7 +12,7 @@ let
     //Below: Using Table.Buffer, so that order is preserved on expand
     ,ExpandRight = Table.ExpandTableColumn(Table.Buffer(Combine), "Right", OldRightColNames, NewRightColNames)   
     ,Coalesce = List.Accumulate(List.Zip({LeftKeys,NewRightKeys}),ExpandRight, (Table, Keys) =>
-                Table.ReplaceValue(Table,each Record.Field(_,Keys{0}),each Record.Field(_,Keys{1}),Replacer.ReplaceValue,{Keys{0}}))
+                Table.ReplaceValue(Table, null,each Record.Field(_,Keys{1}),Replacer.ReplaceValue,{Keys{0}}))
     ,RemoveRightKeys = Table.RemoveColumns(Coalesce,NewRightKeys)
     ,OriginalLeftKeyTypes = List.Transform(LeftKeys, each Type.TableColumn(Value.Type(LeftTable),_))
     ,ChangeTypes = Table.TransformColumnTypes(RemoveRightKeys,List.Zip({LeftKeys, OriginalLeftKeyTypes}))
