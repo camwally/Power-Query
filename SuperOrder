@@ -6,8 +6,8 @@ let
         ,Order = List.Transform(List, each _{1}?)
         ,TableForm = Table.FromColumns({ColName,Order},{"ColName","Order"})
         ,Comparer = (a as record, b as record) => Number.From(a[Order] is null or b[Order] is null) 
-        ,PartionedTable = Table.Group(TableForm, {"Order"}, {{"NestedTables", each Table.ToRows(_), type list}},GroupKind.Local, Comparer)
-        ,PartionedList = PartionedTable[NestedTables]
+        ,PartionedTable = Table.Group(TableForm, {"Order"}, {{"NestedLists", each Table.ToRows(_), type list}},GroupKind.Local, Comparer)
+        ,PartionedList = PartionedTable[NestedLists]
      in
          PartionedList
 
