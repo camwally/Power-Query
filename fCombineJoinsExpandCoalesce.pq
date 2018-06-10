@@ -1,3 +1,8 @@
+/* Similar to combine joins, but also: 
+1) Preserves the order
+2) Expands right hand side table
+3) Right key is transferred to left key when left key is null, right key is then deleted */
+
 let f = (LeftTable as table  ,LeftKeys as list
         ,RightTable as table ,RightKeys as list
         ,ListOfJoins as list) =>
