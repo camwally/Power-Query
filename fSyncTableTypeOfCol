@@ -4,10 +4,5 @@ Based on Marcel Beugals code at
 https://social.technet.microsoft.com/Forums/en-US/636e9b44-6820-4ff2-ab60-5dd6a5307bd2/type-conversion-mysteries
 */
 
-let Func = (Table as table,Col as text) => 
-let
-    SetTableType = Table.TransformColumns(Table, {Col, each {_}{0}, Value.Type(Table.Column(Table,Col){0})})
-in
-    SetTableType
-in
-    Func
+(PreviousStep as table,ColName as text) =>
+Table.TransformColumns(PreviousStep, {ColName, each {_}{0}, Value.Type(Table.Column(PreviousStep,ColName){0})})
