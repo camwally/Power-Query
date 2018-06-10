@@ -1,3 +1,7 @@
+/*It's a bit like Table.Sort, but:
+1) Sorts are stable
+2) If you neglect to put a Order.Ascending or a Order.Descending then ordered by first occurrence */
+    
 (Table as table, List as list) =>
 let
      fMakeEfficientList = (List as list) =>
