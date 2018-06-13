@@ -3,9 +3,8 @@
 (tblToAlter as table, tblGet as table) =>
 let
     typetblGet = Value.Type(tblGet)
-   ,NameColsFrom = Table.ColumnNames(tblGet) 
-   ,NameColsTo = Table.ColumnNames(tblToAlter)
-   ,NameCols = List.Intersect({NameColsFrom, NameColsTo})
+   ,NameCols = List.Intersect({Table.ColumnNames(tblGet) 
+                              ,Table.ColumnNames(tblToAlter)})
    ,NameFuncTypes = List.Transform(NameCols, (x) => { x
                                                      ,each {_}{0}
                                                      ,Type.TableColumn(typetblGet, x) })
