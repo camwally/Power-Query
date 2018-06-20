@@ -7,15 +7,17 @@
 
 (Table as table, RandColName as text, optional TransformAndTypeCriteria as any) =>
 let
-    fMakeSureIsList = each if _ is list then _ else {_}    
-   ,List =  List.Buffer(fMakeSureIsList(TransformAndTypeCriteria))
-   ,List2 = if List.Count(List)>2 then error "Invalid Criteria (Too many items)" else List
-   ,Transform = if    List2{0} is null
-                   or List2{0} is type then null else
-                if List2{0} is function then List2{0} else
+    List = List.Buffer( 
+            if not (TransformAndTypeCriteria is list) then {TransformAndTypeCriteria} else
+            if List.Count(TransformAndTypeCriteria)<=2 then TransformAndTypeCriteria else
+            error "Invalid Criteria (Too many items)" ) 
+   ,Transform = if    List{0} is null
+                   or List{0} is type then null else
+                if List{0} is function then List{0} else
                 error "Invalid Criteria (Tranform)" 
-   ,ListLast = List.Last(List2)
-   ,Type = if ListLast is null then type number else  
+   ,ListLast = List.Last(List)
+   ,Type = if    ListLast is null 
+              or ListLast is function then type number else  
            if ListLast is type then ListLast else
            error "Invalid Criteria (Type)" 
    ,ListTable = Table.ToColumns(Table)
