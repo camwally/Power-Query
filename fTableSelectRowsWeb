@@ -20,6 +20,7 @@ let
    ,Combine = Table.Combine(ListOfTables)
    ,Sideways = Table.FromRows(List.Transform(ListOfTables, each _[Value]))
 in
-    if Horizontal = false then Combine else
-    if Horizontal = true  then Sideways else
+    try
+    if Horizontal then Sideways else Combine
+    otherwise 
     error "4th parameter (Horizontal) must be logical (true or false) or ignored (which reverts to false)"
