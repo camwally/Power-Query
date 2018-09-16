@@ -1,0 +1,25 @@
+(Table as table, fnFilter as function, optional Range as list, optional Horizontal as logical)=>
+let
+    Range = if Range = null then {0} else Range
+   ,Horizontal = if Horizontal = null then false else Horizontal
+   ,AddIndex = Table.AddIndexColumn(Table, "Index", 0, 1)
+   ,Filter = Table.SelectRows(AddIndex, fnFilter) //Use List.PositionsOf instead?
+   ,Positions = List.Buffer(Filter[Index])
+   ,Values = List.Buffer(Table[Column1]) 
+   ,ListOfTables = List.Transform(Positions, (Pos)=>  
+    let  
+        Len = List.Count(Range) 
+       ,Gen = List.Generate(()=>[i= 0      , Rng = Range{i}, Position = Pos+Rng,  Value = Values{Position}]
+                           ,each _[i] < Len
+                           ,each [i= _[i]+1, Rng = Range{i}, Position = Pos+Rng,  Value = Values{Position}]
+                           ,each _[[Value],[Rng],[Position]])
+       ,Table = Table.FromRecords(Gen)
+       ,RenameAndChangeTypes = Value.ReplaceType(Table, type table[Value = text, Range = Int64.Type, Position = Int64.Type]) 
+    in
+        RenameAndChangeTypes)
+   ,Combine = Table.Combine(ListOfTables)
+   ,Sideways = Table.FromRows(List.Transform(ListOfTables, each _[Value]))
+in
+    if Horizontal = false then Combine else
+    if Horizontal = true  then Sideways else
+    error "4th parameter (Horizontal) must be logical (true or false) or ignored (which reverts to false)"
