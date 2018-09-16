@@ -3,7 +3,7 @@ let
     Range = if Range = null then {0} else Range
    ,Horizontal = if Horizontal = null then false else Horizontal
    ,AddIndex = Table.AddIndexColumn(Table, "Index", 0, 1)
-   ,Filter = Table.SelectRows(AddIndex, fnFilter) //Use List.PositionsOf instead?
+   ,Filter = Table.SelectRows(AddIndex, fnFilter) 
    ,Positions = List.Buffer(Filter[Index])
    ,Values = List.Buffer(Table[Column1]) 
    ,ListOfTables = List.Transform(Positions, (Pos)=>  
