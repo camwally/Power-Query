@@ -1,6 +1,10 @@
-(Table as table, fnFilter as function, optional Range as list, optional Horizontal as logical)=>
+(Table as table
+,fnFilter as function
+,optional Range as nullable list
+,optional Horizontal as nullable logical)=>
+
 let
-    Range = if Range = null then {0} else Range
+    Range      = if Range      = null then {0}   else Range
    ,Horizontal = if Horizontal = null then false else Horizontal
    ,AddIndex = Table.AddIndexColumn(Table, "Index", 0, 1)
    ,Filter = Table.SelectRows(AddIndex, fnFilter) 
@@ -18,9 +22,6 @@ let
     in
         RenameAndChangeTypes)
    ,Combine = Table.Combine(ListOfTables)
-   ,Sideways = Table.FromRows(List.Transform(ListOfTables, each _[Value]))
+   ,ValuesToRows = Table.FromRows(List.Transform(ListOfTables, each _[Value]))
 in
-    try
-    if Horizontal then Sideways else Combine
-    otherwise 
-    error "4th parameter (Horizontal) must be logical (true or false) or ignored (which reverts to false)"
+    if Horizontal then ValuesToRows else Combine
