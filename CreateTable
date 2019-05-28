@@ -1,0 +1,48 @@
+(InputTable as table) as text =>
+
+let
+
+    Source = 
+        Table.Schema(InputTable),
+    SortRows = 
+        Table.Sort(
+            Source,
+            {{"Position", Order.Ascending}}),
+    RemoveColumns = 
+        Table.SelectColumns(
+            SortRows,
+            {"Name", "TypeName"}),
+    AddCustom = 
+        Table.AddColumn(
+            RemoveColumns, 
+            "TypeNames", 
+            each 
+            Expression.Identifier([Name]) & " = " & [TypeName]),
+    TableTypeRec = 
+        "[" & Text.Combine(AddCustom[TypeNames], ", ") & "]"
+
+//Code above is Chris Webbs with slight adjustments
+
+   ,ValuesToConstant = Table.TransformColumns(InputTable,{},Expression.Constant)
+   ,ValuesToConstLen = Table.TransformColumns(ValuesToConstant,{},Text.Length)
+   ,MaxLengthEachCol = List.Buffer(List.Transform(Table.ToColumns(ValuesToConstLen),List.Max))
+   ,List = List.Transform(Table.ToRows(ValuesToConstant)
+                         ,(RowAsList)=> 
+                                let
+                                    Zip = List.Zip({RowAsList,MaxLengthEachCol})
+                                   ,PadOut = List.Transform(Zip,each Function.Invoke(Text.PadEnd,_)) 
+                                   ,CombineValues = "{"&Text.Combine(PadOut,",")&"}"
+                                in 
+                                    CombineValues)
+   ,Body = "{"&Text.Combine(List,"#(lf),")&"}"
+    
+
+   ,Together =   "#table(type table" 
+               & TableTypeRec
+               & ",#(lf)"
+               & Body
+               & "#(lf))"
+
+in
+
+    Together
