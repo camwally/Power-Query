@@ -1,6 +1,5 @@
+(Table as table, optional MaxLength as number)=>
 let
-Table = DemographicsPostcodeToLGA, MaxLength = 20,
-
     TableType = Value.Type(Table)
    ,ColNames = Table.ColumnNames(Table)
    ,ListOfCols = List.Transform(Table.ToColumns(Table), List.Distinct)
