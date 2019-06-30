@@ -5,8 +5,8 @@ let
         ColumnNames = {text&"_Date"
                       ,text&"_Time"} // Change this to fit your table naming standards
        ,SplitColumn =  Table.SplitColumn(table, text, each {_,_}, ColumnNames)
-       ,ColumnTransType = {{DateTime.Date, type date}
-                          ,{DateTime.Time, type time}} 
+       ,ColumnTransType = {{DateTime.Date, type nullable date}
+                          ,{DateTime.Time, type nullable time}} 
        ,TransformColumns = Table.TransformColumns(SplitColumn,List.Zip(ColumnNames&List.Zip(ColumnTransType)))
     in
         TransformColumns 
