@@ -3,8 +3,8 @@
 ,optional ColNameDate as nullable text
 ,optional ColNameTime as nullable text) as table=> 
 let
-     ColNameDate = if ColNameDate is null then "Date" else ColNameDate // Change these default values to
-    ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // fit your table naming standards
+     ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values to
+    ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // your own language
     ,ColNameIsList = if ColName is list then true else
                      if ColName is text then false else
                      error "ColName needs to be a text value or a list of text values"
@@ -12,8 +12,8 @@ let
                                 else {ColName} 
    ,fnSplitColumn = (State as table, CurrentColName as text) as table=>
     let
-        CurrentColNamesNew = if ColNameIsList then {CurrentColName&"_"&ColNameDate
-                                                   ,CurrentColName&"_"&ColNameTime}
+        CurrentColNamesNew = if ColNameIsList then {CurrentColName&"."&ColNameDate  //You can change the "." to something else
+                                                   ,CurrentColName&"."&ColNameTime} //to fit your table naming standards 
                                               else {ColNameDate
                                                    ,ColNameTime}                                      
        ,SplitColumn =  Table.SplitColumn(State, CurrentColName, each {_,_}, CurrentColNamesNew)
