@@ -3,13 +3,11 @@
 ,optional ColNameDate as nullable text
 ,optional ColNameTime as nullable text) as table=> 
 let
-     ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values to
-    ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // your own language
-    ,ColNameIsList = if ColName is list then true else
+    ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values to
+   ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // your own language
+   ,ColNameIsList = if ColName is list then true else
                      if ColName is text then false else
-                     error "ColName needs to be a text value or a list of text values"
-   ,ColNames = if ColNameIsList then  ColName 
-                                else {ColName} 
+                     error "ColName needs to be a text value or a list of text values" 
    ,fnSplitColumn = (State as table, CurrentColName as text) as table=>
     let
         CurrentColNamesNew = if ColNameIsList then {CurrentColName&"."&ColNameDate  //You can change the "." to something else
@@ -22,6 +20,9 @@ let
        ,TransformColumns = Table.TransformColumns(SplitColumn,List.Zip(CurrentColNamesNew&List.Zip(ColumnTransType)))
     in
         TransformColumns 
-   ,IterateOverColumns = List.Accumulate(table,ColNames,fnSplitColumn)
 in
-    IterateOverColumns
+     List.Accumulate(
+           table
+          ,if ColNameIsList then  ColName 
+                            else {ColName} 
+          ,fnSplitColumn)
