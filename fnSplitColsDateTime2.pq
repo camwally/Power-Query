@@ -3,8 +3,8 @@
 ,optional ColNameDate as nullable text
 ,optional ColNameTime as nullable text) as table=> 
 let
-    ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values to
-   ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // your own language
+    ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values
+   ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // to your own language
    ,ColNameIsList = if ColName is list then true else
                      if ColName is text then false else
                      error "ColName needs to be a text value or a list of text values" 
