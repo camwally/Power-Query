@@ -6,8 +6,8 @@ let
     ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values
    ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // to your own language
    ,ColNameIsList = if ColName is list then true else
-                     if ColName is text then false else
-                     error "ColName needs to be a text value or a list of text values" 
+                    if ColName is text then false else
+                    error "ColName needs to be a text value or a list of text values" 
    ,fnSplitColumn = (State as table, CurrentColName as text) as table=>
     let
         CurrentColNamesNew = if ColNameIsList then {CurrentColName&"."&ColNameDate  //You can change the "." to something else
