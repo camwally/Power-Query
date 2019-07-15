@@ -26,3 +26,5 @@ in
           ,if ColNameIsList then  ColName 
                             else {ColName} 
           ,fnSplitColumn)
+
+// Need to try with Table.AddColumn with column of nested tables
