@@ -3,28 +3,26 @@
 ,optional ColNameDate as nullable text
 ,optional ColNameTime as nullable text) as table=> 
 let
-    ColNameDate = if ColNameDate is null then "Date" else ColNameDate // You can change these default values
-   ,ColDateTime = if ColNameTime is null then "Time" else ColNameTime // to your own language
-   ,ColNameIsList = if ColName is list then true else
-                    if ColName is text then false else
-                    error "ColName needs to be a text value or a list of text values" 
-   ,fnSplitColumn = (State as table, CurrentColName as text) as table=>
+     ColNameDate_D = if ColNameDate is null then "Date" else ColNameDate // You can change these default values 
+    ,ColNameTime_D = if ColNameTime is null then "Time" else ColNameTime // to your own language
+    ,ColNameIsList = if ColName is list then true else
+                     if ColName is text then false else
+                     error "ColName needs to be a text value or a list of text values" 
+    ,fnSplitColumn = (State as table, CurrentColName as text) as table=>
     let
-        CurrentColNamesNew = if ColNameIsList then {CurrentColName&"."&ColNameDate  //You can change the "." to something else
-                                                   ,CurrentColName&"."&ColNameTime} //to fit your table naming standards 
-                                              else {ColNameDate
-                                                   ,ColNameTime}                                      
+        CurrentColNamesNew = if ColNameIsList then {CurrentColName&"."&ColNameDate_D  //You can change the "." to something else
+                                                   ,CurrentColName&"."&ColNameTime_D} //to fit your table naming standards 
+                                              else {ColNameDate_D
+                                                   ,ColNameTime_D}                                      
        ,SplitColumn =  Table.SplitColumn(State, CurrentColName, each {_,_}, CurrentColNamesNew)
        ,ColumnTransType = {{DateTime.Date, type nullable date}
                           ,{DateTime.Time, type nullable time}} 
-       ,TransformColumns = Table.TransformColumns(SplitColumn,List.Zip(CurrentColNamesNew&List.Zip(ColumnTransType)))
+       ,TransformColumns = Table.TransformColumns(SplitColumn,List.Zip({CurrentColNamesNew}&List.Zip(ColumnTransType)))
     in
-        TransformColumns 
+        TransformColumns
 in
      List.Accumulate(
-           table
-          ,if ColNameIsList then  ColName 
-                            else {ColName} 
+           if ColNameIsList then  ColName 
+                            else {ColName} //This goes FIRST!!!!!!
+          ,table
           ,fnSplitColumn)
-
-// Need to try with Table.AddColumn with column of nested tables
