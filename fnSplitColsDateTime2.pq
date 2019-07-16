@@ -1,19 +1,21 @@
 (table as table
 ,ColName as any // Can be as list of column names or a single column name 
 ,optional ColNameDate as nullable text
-,optional ColNameTime as nullable text) as table=> 
+,optional ColNameTime as nullable text
+,optional Delimiter   as nullable text) as table=> 
 let
-     ColNameDate_D = if ColNameDate is null then "Date" else ColNameDate // You can change these default values 
-    ,ColNameTime_D = if ColNameTime is null then "Time" else ColNameTime // to your own language
+     ColNameDateD = if ColNameDate is null then "Date" else ColNameDate // Default values can be changed to fit  
+    ,ColNameTimeD = if ColNameTime is null then "Time" else ColNameTime // your own language or table naming standards
+    ,DelimiterD   = if Delimiter   is null then "."    else Delimiter   // (only applicable when ColName is list)
     ,ColNameIsList = if ColName is list then true else
                      if ColName is text then false else
                      error "ColName needs to be a text value or a list of text values" 
     ,fnSplitColumn = (State as table, CurrentColName as text) as table=>
     let
-        CurrentColNamesNew = if ColNameIsList then {CurrentColName&"."&ColNameDate_D  //You can change the "." to something else
-                                                   ,CurrentColName&"."&ColNameTime_D} //to fit your table naming standards 
-                                              else {ColNameDate_D
-                                                   ,ColNameTime_D}                                      
+        CurrentColNamesNew = if ColNameIsList then {CurrentColName & DelimiterD & ColNameDateD  
+                                                   ,CurrentColName & DelimiterD & ColNameTimeD} 
+                                              else {ColNameDateD
+                                                   ,ColNameTimeD}                                                   
        ,SplitColumn =  Table.SplitColumn(State, CurrentColName, each {_,_}, CurrentColNamesNew)
        ,ColumnTransType = {{DateTime.Date, type nullable date}
                           ,{DateTime.Time, type nullable time}} 
@@ -23,6 +25,6 @@ let
 in
      List.Accumulate(
            if ColNameIsList then  ColName 
-                            else {ColName} //This goes FIRST!!!!!!
+                            else {ColName} 
           ,table
           ,fnSplitColumn)
