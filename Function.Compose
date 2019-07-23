@@ -1,0 +1,17 @@
+//Based on Curt Hagenlochers code at
+//https://social.technet.microsoft.com/Forums/en-US/10b20f9f-488b-4626-868f-35eedcbfab87/whats-functionfrom-for?forum=powerquery
+//But uses the function return type of the outer function
+
+(outerFunction as function, innerFunction as function) as function =>
+let
+    innerFunctionType = Value.Type(innerFunction)
+   ,outerFunctionType = Value.Type(outerFunction)
+   ,resultantFunctionType = Type.ForFunction( 
+        [ReturnType = Type.FunctionReturn(outerFunctionType)
+        ,Parameters = Type.FunctionParameters(innerFunctionType)]
+       ,Type.FunctionRequiredParameters(innerFunctionType))
+   ,resultantFunction = Function.From(
+        resultantFunctionType
+       ,(list) => outerFunction(Function.Invoke(innerFunction, list)))
+in
+    resultantFunction
