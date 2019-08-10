@@ -1,0 +1,6 @@
+(list as list, transform as function)=>
+let
+	listTransform = List.Transform(list, transform),
+	listType      = type {Type.FunctionReturn(Value.Type(transform))}
+in
+	Value.ReplaceType(listTransform,listType)
