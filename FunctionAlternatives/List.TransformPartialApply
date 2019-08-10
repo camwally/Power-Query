@@ -1,0 +1,13 @@
+(transform as function)=>
+let 
+    listType = type {Type.FunctionReturn(Value.Type(transform))}
+   ,returnType = Type.ForFunction([ReturnType = listType
+                                  ,Parameters = [args = type list]
+                                  ]
+                                 ,1)
+in
+    Value.ReplaceType((list as list)=>
+        Value.ReplaceType(
+            List.Transform(list,transform)
+           ,listType)
+   ,returnType)
