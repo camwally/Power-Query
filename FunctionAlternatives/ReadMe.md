@@ -1,1 +1,1 @@
-These functions take into account function return types in a better way. 
+These functions are an improvement (IMHO) of functions created by Microsoft by taking function type return types more seriously. 
