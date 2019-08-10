@@ -1,0 +1,12 @@
+(function as function)=>
+    Value.ReplaceType(
+        (args as list)=>
+            Function.Invoke(
+                function
+               ,args)
+       ,Type.ForFunction(
+            [ReturnType=Type.FunctionReturn(Value.Type(function))
+            ,Parameters=[args = type list]
+            ]
+           ,1)
+    )
