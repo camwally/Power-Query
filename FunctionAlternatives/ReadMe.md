@@ -1,1 +1,1 @@
-These provide alternatives to functions already in the standard library
+These functions take into account function return types in a better way. 
