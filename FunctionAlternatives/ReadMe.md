@@ -1,1 +1,1 @@
-These functions are an improvement (IMHO) of functions created by Microsoft by taking function type return types more seriously. 
+These functions are versions of functions that have been created by Microsoft. These functions however, help keep the function type return types which are so easily lost. One of the outcomes is that these functions are more likely to stop your columns changing to type any. 
