@@ -1,2 +1,1 @@
-List.Accumulate
-Function.PartialApply
+List.Accumulate, Function.PartialApply
