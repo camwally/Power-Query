@@ -1,5 +1,0 @@
-(table as table, newColumnName as text, columnGenerator as function, optional columnType as nullable type) as table =>
-let
-    colType = if columnType is null then Type.FunctionReturn(Value.Type(columnGenerator)) else columnType
-in
-    Table.AddColumn(table, newColumnName, columnGenerator, colType) 
