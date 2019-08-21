@@ -1,0 +1,15 @@
+(function as function)=>
+let 
+    funcType = Value.Type(function)
+   ,InvokedFunction = Value.ReplaceType(
+       (record as record)=>
+        Function.Invoke(
+            function
+           ,Record.FieldValues(
+                Record.SelectFields(
+                    record
+                   ,Record.FieldNames(Type.FunctionParameters(funcType))
+                   ,MissingField.UseNull)))
+   ,Type.ForFunction([ReturnType=Type.FunctionReturn(funcType), Parameters=[record = type record]],1))
+in
+    InvokedFunction
