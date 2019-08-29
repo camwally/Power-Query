@@ -1,0 +1,16 @@
+(text as nullable text
+,old  as nullable text
+,new  as nullable text) as nullable text =>
+let
+    newText    = if   new = null 
+                 then "" 
+                 else new
+   ,oldPosList = Text.PositionOf(text,old, Occurrence.All, Comparer.OrdinalIgnoreCase)
+   ,oldLen     = Text.Length(old)
+in
+    if   text = null 
+      or old  = null
+    then text 
+    else List.Accumulate(List.Reverse(oldPosList)
+                        ,text
+                        ,(txt,pos) => Text.ReplaceRange(txt, pos, oldLen, newText))
