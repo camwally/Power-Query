@@ -1,0 +1,21 @@
+(start as nullable date
+,end as nullable date)=>
+let
+ //   start = Date.From("2/10/11")
+ //  ,  end = Date.From("2/10/122"),
+    datesAsInt =  
+    let 
+        DateToInt = each Date.Year(_)*12 
+                       + Date.Month(_)-1 
+    in 
+        {DateToInt(start)..DateToInt(end)}
+   ,datesAsDate = List.Transform(datesAsInt
+                                ,each Date.EndOfMonth(#date(Number.RoundDown(_/12)
+                                                           ,Number.Mod(_,12)+1
+                                                           ,1)))
+   ,replaceType = Value.ReplaceType(datesAsDate, type {date})
+in
+    if   start = null
+      or end   = null  
+    then {} 
+    else replaceType
