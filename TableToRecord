@@ -1,0 +1,8 @@
+(table as table, optional buffer as nullable logical)=>
+let
+    tab = if buffer = true then Table.Buffer(table) else table,
+    Name = Table.ColumnNames(tab),
+    Value = Table.ToColumns(tab),
+    Record = Record.FromTable(Table.FromColumns({Name, Value},{"Name","Value"}))
+in
+    Record
