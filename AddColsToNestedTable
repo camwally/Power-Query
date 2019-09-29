@@ -1,0 +1,42 @@
+(table as table
+,nestedTableCol as text
+,optional outerCols as nullable list
+,optional nestedCols as any)=>
+let
+    outerCols2 = List.Buffer(
+                    if outerCols is null then List.RemoveItems(Table.ColumnNames(table),{nestedTableCol}) 
+                                         else outerCols),
+    newCols = List.Buffer(
+    let
+        nestedColsIsNull = outerCols2,
+        nestedColsIsFunction = List.Transform(outerCols2, nestedCols),
+        nestedColsIsList = 
+        let
+            zip = List.Zip({outerCols2,nestedCols}),
+            coalesce = List.Transform(zip, each List.Last(List.RemoveNulls(_)))
+        in
+            coalesce
+    in
+             if nestedCols is null then nestedColsIsNull
+        else if nestedCols is function then nestedColsIsFunction
+        else if nestedCols is list then nestedColsIsList
+        else error "nestedCols parameter must be ommited or of type: null, list or function"
+    ),
+    /* might be inefficient here but general use is for control tables 
+    where outer table is simple to evaluate and inner table is difficult to evaluate*/
+    outerColTypes = List.Buffer(List.Transform(outerCols2, each Type.TableColumn(Value.Type(table),_))), 
+    listsTogether = List.Buffer(Table.ToRecords(Table.FromColumns({outerCols2,newCols, outerColTypes},{"outerColName","newColName","outerColType"}))),
+    next = Table.AddColumn(
+        table,
+        "TableToCombine",
+        (outerRec as record)=>List.Accumulate(
+            listsTogether, 
+            Record.Field(outerRec,nestedTableCol),
+            (tab,ltRec)=>Table.AddColumn(
+                tab,
+                ltRec[newColName],
+                each Record.Field(outerRec,ltRec[outerColName]),
+                ltRec[outerColType]))
+        ,type table)
+    in
+        next
