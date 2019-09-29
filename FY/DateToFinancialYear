@@ -1,0 +1,8 @@
+(date as nullable date) as nullable number=>
+let
+    year = Date.Year(date),
+    finYear = if Date.Month(date) > 6
+            then year+1 
+            else year
+in 
+    if date is null then null else finYear
