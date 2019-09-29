@@ -1,0 +1,1 @@
+(date as nullable date) as nullable date=>if date is null then null else #date(DateToFinancialYear(date),6,30)
