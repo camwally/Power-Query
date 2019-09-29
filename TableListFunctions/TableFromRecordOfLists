@@ -1,7 +1,7 @@
 (rec as record)=>
 let
     tab2col = Record.ToTable(rec),
-    Valuess_Names = List.Reverse(Table.ToColumns(tab2col)),
+    valuess_names = List.Reverse(Table.ToColumns(tab2col)),
     tab = Function.Invoke(Table.FromColumns,Valuess_Names)
 in
     tab
