@@ -1,0 +1,33 @@
+(start as date
+,end   as date)=>
+let
+    datesAsInt =  
+    let 
+        DateToInt = each Date.Year(_)*12 
+                       + Date.Month(_)-1 
+    in 
+        {DateToInt(start)..DateToInt(end)}
+   ,datesAsDate = 
+    List.Buffer(
+       Value.ReplaceType(
+           List.Transform(
+               datesAsInt
+              ,each #date(
+                  Number.RoundDown(_/12)
+                 ,Number.Mod(_,12)+1
+                 ,1))
+           ,type {date}))
+   ,FracOfMonthToEnd            = (date as date) => Date.Day(date)/Date.DaysInMonth(date)
+   ,FracOfMonthToDayBeforeStart = (date as date) => (Date.Day(date)-1)/Date.DaysInMonth(date)
+   ,noOfDates = List.Count(datesAsDate)
+   ,fracsOfMonths = Value.ReplaceType(
+                         if start>end then error "end date before start date" 
+                    else if noOfDates = 1 then {FracOfMonthToEnd(end)-FracOfMonthToDayBeforeStart(start)} 
+                    else  {1-FracOfMonthToDayBeforeStart(start)}
+                         &List.Repeat({1},noOfDates-2)
+                         &{FracOfMonthToEnd(end)}
+                   ,type {Percentage.Type})
+   ,datesInTable = Table.FromColumns({datesAsDate, fracsOfMonths},{"Date","Fraction"})
+   ,addKey = Table.AddKey(datesInTable,{"Date"},true)
+in
+    addKey
