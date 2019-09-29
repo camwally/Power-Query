@@ -1,0 +1,7 @@
+(rec as record)=>
+let
+    tab2col = Record.ToTable(rec),
+    listlist = List.Reverse(Table.ToColumns(tab2col)),
+    tab = Function.Invoke(Table.FromColumns,listlist)
+in
+    tab
