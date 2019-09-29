@@ -40,3 +40,5 @@ let
         ,type table)
     in
         next
+        
+        //Table.FromPartitions along with List.Zip could have been used instead of Table.AddColumns
