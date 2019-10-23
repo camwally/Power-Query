@@ -9,10 +9,11 @@ let
                  ,counter = 0],
             each [counter] <= listToSumCount,
             each [item = [item]+listToSum{[counter]}
-                 ,counter = [counter]+1]
+                 ,counter = [counter]+1],
+            each [item]
         ),1)),
     addIndex = Table.AddIndexColumn(tableB,"IndexUniqueName",0,1),
-    addRunningTotal = Table.AddColumn(tableB,colAsNew,each runningTotalB{[Index]}),
+    addRunningTotal = Table.AddColumn(addIndex,colAsNew,each runningTotalB{[IndexUniqueName]}, type number),
     removeIndex = Table.RemoveColumns(addRunningTotal,{"IndexUniqueName"})
 in
     removeIndex
