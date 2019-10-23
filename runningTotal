@@ -1,0 +1,18 @@
+(table as table, colToSum as text, colAsNew as text)=>
+let
+    tableB = Table.Buffer(table),
+    listToSum = List.Buffer(Table.Column(tableB,colToSum)),
+    listToSumCount = List.Count(listToSum),
+    runningTotalB = List.Buffer(List.Skip(
+        List.Generate(
+            ()=> [item = 0
+                 ,counter = 0],
+            each [counter] <= listToSumCount,
+            each [item = [item]+listToSum{[counter]}
+                 ,counter = [counter]+1]
+        ),1)),
+    addIndex = Table.AddIndexColumn(tableB,"IndexUniqueName",0,1),
+    addRunningTotal = Table.AddColumn(tableB,colAsNew,each runningTotalB{[Index]}),
+    removeIndex = Table.RemoveColumns(addRunningTotal,{"IndexUniqueName"})
+in
+    removeIndex
