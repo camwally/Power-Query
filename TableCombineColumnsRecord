@@ -1,0 +1,10 @@
+(table as table, sourceColumns as list, feildNames as any, column as text) as table=>
+let 
+    combiner = each Record.FromList(_,feildNames),
+    combinerWithReturnType = Value.ReplaceType(
+        combiner,
+        Type.ForFunction([ReturnType = feildNames,Parameters= [_ = type any]],1)),
+    combinerFinal = if feildNames is type then combinerWithReturnType else combiner,
+    func = Table.CombineColumns(table, sourceColumns, combinerFinal, column)
+in
+    func
