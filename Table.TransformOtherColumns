@@ -1,0 +1,19 @@
+(Table as table
+,ColumnsToIgnore as list
+,Function as function
+,TypeForColumns as type) as Table =>
+let
+  FunctionType = Value.Type(Function),
+  TransformOtherCols = Table.TransformColumns(
+    Table,
+    List.Transform(
+      ColumnsToIgnore,
+      (ColName)=> {ColName, each _}),
+    Value.ReplaceType(
+      Function,
+      Type.ForFunction(
+        [ReturnType = TypeForColumns
+        ,Parameters = Type.FunctionParameters(FunctionType)],
+        Type.FunctionRequiredParameters(FunctionType))))
+in
+  TransformOtherCols
