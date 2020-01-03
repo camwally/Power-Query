@@ -15,6 +15,7 @@ let
         ,#"None.Type" = "none"
         ,#"Null.Type" = "null"
         ,#"Number.Type" = "number"
+        ,#"Record.Type" = "record"
         ,#"Table.Type" = "table"
         ,#"Text.Type" = "text"
         ,#"Time.Type" = "time"
