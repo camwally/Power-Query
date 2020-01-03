@@ -1,7 +1,6 @@
 (InputTable as table) as text =>
 let
-    Source = 
-        Table.Schema(InputTable),
+    Source = Table.Schema(InputTable),
     SortRows = Table.Sort(Source,{{"Position", Order.Ascending}}),
     SimplifyTypeNameRec = 
         [#"Any.Type" = "any"
