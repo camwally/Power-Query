@@ -11,13 +11,13 @@ let
     RemoveColumns = 
         Table.SelectColumns(
             SortRows,
-            {"Name", "TypeName"}),
+            {"Name", "TypeName","IsNullable"}),
     AddCustom = 
         Table.AddColumn(
             RemoveColumns, 
             "TypeNames", 
             each 
-            Expression.Identifier([Name]) & " = " & [TypeName]),
+            Expression.Identifier([Name]) & " = " & (if [IsNullable] then "nullable " else "") & [TypeName]),
     TableTypeRec = 
         "[" & Text.Combine(AddCustom[TypeNames], ", ") & "]"
 
