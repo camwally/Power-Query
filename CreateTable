@@ -1,17 +1,27 @@
 (InputTable as table) as text =>
-
 let
-
     Source = 
         Table.Schema(InputTable),
-    SortRows = 
-        Table.Sort(
-            Source,
-            {{"Position", Order.Ascending}}),
-    RemoveColumns = 
-        Table.SelectColumns(
-            SortRows,
-            {"Name", "TypeName","IsNullable"}),
+    SortRows = Table.Sort(Source,{{"Position", Order.Ascending}}),
+    SimplifyTypeNameRec = 
+        [#"Any.Type" = "any"
+        ,#"Binary.Type" ="binary"
+        ,#"Date.Type" ="date"
+        ,#"DateTime.Type" ="datetime"
+        ,#"DateTimeZone.Type" ="datetimezone"
+        ,#"Duration.Type" ="duration"
+        ,#"Function.Type" ="function"
+        ,#"List.Type" ="list"
+        ,#"Logical.Type" ="logical"
+        ,#"None.Type" ="none"
+        ,#"Null.Type" ="null"
+        ,#"Number.Type" ="number"
+        ,#"Table.Type" ="table"
+        ,#"Text.Type" ="text"
+        ,#"Time.Type" ="time"
+        ,#"Type.Type" ="type"],
+    SimplifyTypes = Table.TransformColumns(SortRows,{{"TypeName", each Record.FieldOrDefault(SimplifyTypeNameRec,_,_), type text}}),
+    RemoveColumns = Table.SelectColumns(SimplifyTypes,{"Name", "TypeName","IsNullable"}),
     AddCustom = 
         Table.AddColumn(
             RemoveColumns, 
@@ -21,7 +31,7 @@ let
     TableTypeRec = 
         "[" & Text.Combine(AddCustom[TypeNames], ", ") & "]"
 
-//Code above is Chris Webbs with slight adjustments
+//Code above is based on a function by Chris Webb
 
    ,ValuesToConstant = Table.TransformColumns(InputTable,{},Expression.Constant)
    ,ValuesToConstLen = Table.TransformColumns(ValuesToConstant,{},Text.Length)
