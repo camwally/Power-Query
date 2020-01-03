@@ -20,8 +20,8 @@ let
         ,#"Text.Type" ="text"
         ,#"Time.Type" ="time"
         ,#"Type.Type" ="type"],
-    SimplifyTypes = Table.TransformColumns(SortRows,{{"TypeName", each Record.FieldOrDefault(SimplifyTypeNameRec,_,_), type text}}),
-    RemoveColumns = Table.SelectColumns(SimplifyTypes,{"Name", "TypeName","IsNullable"}),
+    SimplifyTypeNames = Table.TransformColumns(SortRows,{{"TypeName", each Record.FieldOrDefault(SimplifyTypeNameRec,_,_), type text}}),
+    RemoveColumns = Table.SelectColumns(SimplifyTypeNames,{"Name", "TypeName","IsNullable"}),
     AddCustom = 
         Table.AddColumn(
             RemoveColumns, 
@@ -45,14 +45,11 @@ let
                                 in 
                                     CombineValues)
    ,Body = "{"&Text.Combine(List,"#(lf),")&"}"
-    
-
    ,Together =   "#table(type table" 
                & TableTypeRec
                & ",#(lf)"
                & Body
                & "#(lf))"
-
 in
 
     Together
