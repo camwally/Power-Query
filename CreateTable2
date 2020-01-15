@@ -38,14 +38,17 @@ let
 
    ,tableOfExpressions = Table.TransformColumns(inputTable,{},Expression.Constant)
    ,listOfCols = Table.ToColumns(tableOfExpressions)
-   ,listOfColsOfPaddedText = List.Transform(listOfCols,(col as list)=>
-        let 
-            buf = List.Buffer(col),
-            maxTextLength = List.Max(List.Transform(buf,Text.Length)),
-            paddedText = List.Transform(buf,each Text.PadEnd(_,maxTextLength))
-        in
-            paddedText
-   )
+   ,listOfColsOfPaddedText = 
+        List.Transform(
+            listOfCols
+           ,(col as list)=>
+                let 
+                    buf = List.Buffer(col),
+                    maxTextLength = List.Max(List.Transform(buf,Text.Length)),
+                    paddedText = List.Transform(buf,each Text.PadEnd(_,maxTextLength))
+                in
+                    paddedText
+        )
    ,listOfRowsOfPaddedText = List.Zip(listOfColsOfPaddedText)
    ,bodyAsList = List.Transform(listOfRowsOfPaddedText, (row as list)=> "{"&Text.Combine(row,",")&"}")
    ,bodyAsText = "{"&Text.Combine(bodyAsList,"#(lf),")&"#(lf)}"
