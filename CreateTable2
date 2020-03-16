@@ -32,7 +32,7 @@ let
               & (if [IsNullable] then "nullable " else "") 
               & [TypeName]
         )
-   ,tableTypeRec = "#table(type table [" & Text.Combine(addColOfTypeNames[TypeNames], ", ") & "]" 
+   ,tableTypeRec = "[" & Text.Combine(addColOfTypeNames[TypeNames], ", ") & "]" 
 
 //Code above is based on a function by Chris Webb
 
@@ -52,7 +52,7 @@ let
    ,listOfRowsOfPaddedText = List.Zip(listOfColsOfPaddedText)
    ,bodyAsList = List.Transform(listOfRowsOfPaddedText, (row as list)=> "{"&Text.Combine(row,",")&"}")
    ,bodyAsText = "{"&Text.Combine(bodyAsList,"#(lf),")&"#(lf)}"
-   ,together =   "#table(type table" 
+   ,together =   "#table(type table " 
                & tableTypeRec
                & ",#(lf)"
                & bodyAsText
