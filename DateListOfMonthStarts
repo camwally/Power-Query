@@ -1,8 +1,6 @@
 (start as nullable date
 ,end as nullable date)=>
 let
- //   start = Date.From("2/10/11")
- //  ,  end = Date.From("2/10/122"),
     datesAsInt =  
     let 
         DateToInt = each Date.Year(_)*12 
@@ -10,7 +8,7 @@ let
     in 
         {DateToInt(start)..DateToInt(end)}
    ,datesAsDate = List.Transform(datesAsInt
-                                ,each #date(Number.RoundDown(_/12)
+                                ,each #date(Number.IntegerDivide(_,12)
                                            ,Number.Mod(_,12)+1
                                            ,1))
    ,checkForNulls = if   start = null
