@@ -1,7 +1,7 @@
 (Table as table
 ,ColumnsToIgnore as list
 ,Function as function
-,TypeForColumns as type) as Table =>
+,TypeForColumns as type) as table =>
 let
   FunctionType = Value.Type(Function),
   TransformOtherCols = Table.TransformColumns(
