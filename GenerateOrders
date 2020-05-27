@@ -1,6 +1,7 @@
 /*
 This for small tables such as dimension table as Table.Buffer is used
 Generates order based on first Occurrence 
+2 versions presented here
 */
 (table as table,columns as list)=>
 let
@@ -17,6 +18,31 @@ let
                 Record.Field(rec,y),
                 Occurrence.First),
             type nullable Int64.Type))
+            
+in
+    addColumns
+    
+//In this version Table.Group would have probably been a bit quicker    
+(table as table,columns as list)=>
+let
+
+    tableBuffered = Table.Buffer(table),
+    addColumns = List.Accumulate(
+        columns,
+        tableBuffered,
+        (x,y)=>
+        let
+            lst = List.Buffer(List.Distinct(Table.Column(tableBuffered,y)))
+        in
+            Table.AddColumn(
+                x,
+                y&" Order",
+                (rec)=>List.PositionOf(
+                    lst,
+                    Record.Field(rec,y),
+                    Occurrence.First),
+                type nullable Int64.Type)
+        )
             
 in
     addColumns
