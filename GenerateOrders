@@ -1,0 +1,22 @@
+/*
+This for small tables such as dimension table as Table.Buffer is used
+Generates order based on first Occurrence 
+*/
+(table as table,columns as list)=>
+let
+
+    tableBuffered = Table.Buffer(table),
+    addColumns = List.Accumulate(
+        columns,
+        tableBuffered,
+        (x,y)=>Table.AddColumn(
+            x,
+            y&" Order",
+            (rec)=>List.PositionOf(
+                Table.Column(tableBuffered,y),
+                Record.Field(rec,y),
+                Occurrence.First),
+            type nullable Int64.Type))
+            
+in
+    addColumns
