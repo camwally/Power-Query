@@ -22,7 +22,8 @@ let
 in
     addColumns
     
-//In this version Table.Group would have probably been a bit quicker    
+//In this version Table.Group would have probably been a bit quicker  
+//Also could do indexing from 1, so blanks and 0's can't be confused in your DAX
 (table as table,columns as list)=>
 let
 
