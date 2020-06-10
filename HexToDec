@@ -7,3 +7,4 @@ let
     Next2 = List.Sum(List.Transform(List.Zip({RevBuf,RevPosPowers}),List.Product))
 in
     Next2
+//Make it function, better step names and faster by using Text.ToNumber with if 
