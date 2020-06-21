@@ -8,3 +8,26 @@ let
     func = Table.CombineColumns(table, sourceColumns, combinerFinal, column)
 in
     func
+    
+    
+/* - beta, not tried yet
+(table as table, sourceColumns as list, feildNames as any, column as text) as table=>
+let 
+    combiner = each Record.FromList(_,feildNames),
+    combinerWithReturnType = Value.ReplaceType(
+        combiner,
+        Type.ForFunction([ReturnType = feildNames,Parameters= [_ = type any]],1)),
+    combinerFinal =     if feildNames is type then combinerWithReturnType 
+                   else if feildNames is list then 
+                            let
+                                toList = List.Transform(feildNames, (t) => [Type=t, Optional=false]),
+                                toRecord = Record.FromList(toList, feildNames),
+                                toType = Type.ForRecord(toRecord, false)
+                            in
+                                toType //Adapted from Microsoft trippin code 
+                   else if feildNames is null then combiner                            
+                   else error "feildNames must either be record type, list of types of same size as sourceColumns or null",
+    func = Table.CombineColumns(table, sourceColumns, combinerFinal, column)
+in
+    func
+   */
