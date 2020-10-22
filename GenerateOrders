@@ -3,12 +3,17 @@ This for small tables such as dimension table as Table.Buffer is used
 Generates order based on first Occurrence 
 2 versions presented here
 */
-(table as table,columns as list)=>
+(table as table
+,optional columns as nullable list
+,optional ignorecols as nullable logical)=>
 let
-
     tableBuffered = Table.Buffer(table),
+    cols = (if ignorecols = true 
+            then List.RemoveItems(Table.ColumnNames(tableBuffered),columns) 
+            else columns) 
+           ?? Table.ColumnNames(tableBuffered),
     addColumns = List.Accumulate(
-        columns,
+        cols,
         tableBuffered,
         (x,y)=>Table.AddColumn(
             x,
@@ -18,7 +23,6 @@ let
                 Record.Field(rec,y),
                 Occurrence.First),
             type nullable Int64.Type))
-            
 in
     addColumns
     
