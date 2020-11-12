@@ -1,0 +1,37 @@
+let
+    Source = Table.Combine(
+                List.Transform(
+                    {1..12},
+                    each Table.FromValue(Date.ToText(#date(2000,_,1),"MMM")))),
+    #"Renamed Columns" = Table.RenameColumns(Source,{{"Value", "Month 3"}}),
+    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Month 1", each Text.Start([Month 3],1), type text),
+    #"Added Index" = Table.AddIndexColumn(#"Added Custom", "Index", 0, 1, Int64.Type),
+    #"Grouped Rows" = Table.Group(#"Added Index", {"Month 1"}, {{"Table", each Table.AddIndexColumn(_,"WS",0,1,Int64.Type)}}),
+    Custom1 = Table.Combine(#"Grouped Rows"[Table]),
+    #"Sorted Rows" = Table.Sort(Custom1,{{"Index", Order.Ascending}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Sorted Rows",{"Index"}),
+    #"Added Custom1" = Table.AddColumn(#"Removed Columns", "Custom", each [Month 1]&Text.Repeat(Character.FromNumber(8203),[WS]), type text),
+    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom1",{"Month 1", "WS"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns1",{{"Custom", "Month 1"}}),
+    #"Add Key for Joining" = Table.AddKey(#"Renamed Columns1", {"Month 3"}, true)
+in
+    #"Add Key for Joining"
+    
+    
+   /*
+   Month Name 1 Letter = 
+SWITCH([Month Name Short]
+,"Jan","J"
+,"Feb","F"
+,"Mar","M"
+,"Apr","A"
+,"May","M"&REPT(UNICHAR(8203),1)
+,"Jun","J"&REPT(UNICHAR(8203),1)
+,"Jul","J"&REPT(UNICHAR(8203),2)
+,"Aug","A"&REPT(UNICHAR(8203),1)
+,"Sep","S"
+,"Oct","O"
+,"Nov","N"
+,"Dec","D")
+*/
+   
