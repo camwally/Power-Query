@@ -1,0 +1,5 @@
+(Table as table)=>
+let 
+    Rec = Record.FromTable(Table.FromColumns(List.FirstN(Table.ToColumns(Table),2),{"Name","Value"}))
+in 
+    (Text as text)=> if Text = null then null else Record.FieldOrDefault(Rec,Text,Text)
