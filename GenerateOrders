@@ -19,9 +19,10 @@ let
             x,
             y&" Order",
             (rec)=>List.PositionOf(
-                Table.Column(tableBuffered,y),
+                Table.ToColumns(Table.Group(tableBuffered,{y},{},GroupKind.Global,Comparer.OrdinalIgnoreCase)){0},
                 Record.Field(rec,y),
-                Occurrence.First),
+                Occurrence.First,
+                Comparer.OrdinalIgnoreCase),
             type nullable Int64.Type))
 in
     addColumns
