@@ -27,4 +27,4 @@ let
     Filter = Table.SelectRows(Source, each Text.StartsWith([Folder Path],Folder,Comparer.OrdinalIgnoreCase)),
     SkipText = Table.TransformColumns(Filter,{{"Folder Path", each Text.Range(_,Text.Length(Folder)), type text}})
 in
-    SkipText
+    SkipText //Think about using Splitter.SplitTextByEachDelimiter for start part
