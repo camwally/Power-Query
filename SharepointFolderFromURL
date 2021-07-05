@@ -14,9 +14,9 @@ let
 in
     if includeSubFolders = true then #"Filtered Rows" else MakeNameKey
     
-    (folderURL as text) as table =>   
+(folderURL as text) as table =>   
 let
-    Folder = Text.Replace(folderURL,"%20"," "),
+    Folder = let sp = Text.Replace(folderURL,"%20"," ") in if Text.EndsWith(sp,"/") then sp else sp&"/",
     SplitSite = "sites/",
     SplitSiteLen = Text.Length(SplitSite),
     SplitSitePos = Text.PositionOf(Folder,SplitSite,Occurrence.First,Comparer.OrdinalIgnoreCase),
@@ -25,6 +25,6 @@ let
     SharePointURL = Text.Start(Folder,SplitSitePos+SplitSiteLen+Position2+1),
     Source = SharePoint.Files(SharePointURL, [ApiVersion = 15]),
     Filter = Table.SelectRows(Source, each Text.StartsWith([Folder Path],Folder,Comparer.OrdinalIgnoreCase)),
-    SkipText = Table.TransformColumns(Filter,{{"Folder Path", each Text.Combine(List.Skip(Text.ToList(_),Text.Length(folderURL))), type text}})
+    SkipText = Table.TransformColumns(Filter,{{"Folder Path", each Text.Combine(List.Skip(Text.ToList(_),Text.Length(Folder))), type text}})
 in
     SkipText
