@@ -25,6 +25,6 @@ let
     SharePointURL = Text.Start(Folder,SplitSitePos+SplitSiteLen+Position2+1),
     Source = SharePoint.Files(SharePointURL, [ApiVersion = 15]),
     Filter = Table.SelectRows(Source, each Text.StartsWith([Folder Path],Folder,Comparer.OrdinalIgnoreCase)),
-    SkipText = Table.TransformColumns(Filter,{{"Folder Path", each Text.Combine(List.Skip(Text.ToList(_),Text.Length(Folder))), type text}})
+    SkipText = Table.TransformColumns(Filter,{{"Folder Path", each Text.Range(_,Text.Length(Folder)), type text}})
 in
     SkipText
