@@ -1,0 +1,7 @@
+(TimeZone as number) as function =>
+(DateTimeZone as nullable datetimezone) as nullable date=>
+let
+    SwitchedZone = DateTimeZone.SwitchZone(DateTimeZone,TimeZone),
+    Date = DateTime.Date(SwitchedZone) // & DateTime.Time(DateTimeZone)
+in
+    if DateTimeZone is null then null else Date
