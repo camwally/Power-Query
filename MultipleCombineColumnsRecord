@@ -1,0 +1,28 @@
+
+/* Example Control Table
+#table(type table [_Name = nullable text, Value = nullable number, Flag = nullable text],
+{{"Temperature Min"     ,"Temperature Min"     ,"Temperature Min Flag"     }
+,{"Temperature Mean"    ,"Temperature Mean"    ,"Temperature Mean Flag"    }
+,{"Temperature Max"     ,"Temperature Max"     ,"Temperature Max Flag"     }
+,{"Precipitation Liquid","Precipitation Liquid","Precipitation Liquid Flag"}
+,{"Precipitation Solid" ,"Precipitation Solid" ,"Precipitation Solid Flag" }
+})
+*/
+
+(table as table, controlTable as table)=>
+let
+    RecType = Type.TableRow(Value.Type(Table.RemoveColumns(controlTable,"_Name"))),
+    RecFieldNames = List.Buffer(Record.FieldNames(Type.RecordFields(RecType))),
+    ControlVals = List.Transform(Table.ToRows(controlTable),each [ColName = _{0}, OriginalRecFieldNames = List.Skip(_)]),
+    Next = List.Accumulate(
+            ControlVals,
+            table,
+            (tab,cv)=>
+                let
+                    RenameCols = Table.RenameColumns(tab,List.Zip({cv[OriginalRecFieldNames],RecFieldNames})),
+                    CombineCols = Table.CombineColumnsToRecord(RenameCols,cv[ColName],RecFieldNames)
+                in
+                    CombineCols
+                    )
+in
+    Next
