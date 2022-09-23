@@ -1,0 +1,8 @@
+(text as nullable text) as nullable text =>
+let
+	Space = Character.FromNumber(32)
+	Words = Text.Split(text,Space) as list
+	GetRidOfWhitespace = (word as text) as text => Text.Combine(Splitter.SplitTextByWhitespace()(word))
+	Combined = Text.Combine(List.Transform(Words,GetRidOfWhitespace),Space)
+in
+	if text is null then null else Combined 
