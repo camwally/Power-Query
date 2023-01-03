@@ -1,60 +1,61 @@
 (inputTable as table, optional #"table type is vertical?" as nullable logical) as text =>
 let
-	vert = #"table type is vertical?" ?? false 
-   ,source = Table.Schema(inputTable)
-   ,sortRows = Table.Sort(source,{{"Position", Order.Ascending}})
-   ,simplifyTypeNameRec = 
-        [#"Any.Type" = "any"
-        ,#"Binary.Type" = "binary"
-        ,#"Date.Type" = "date"
-        ,#"DateTime.Type" = "datetime"
-        ,#"DateTimeZone.Type" = "datetimezone"
-        ,#"Duration.Type" = "duration"
-        ,#"Function.Type" = "function"
-        ,#"List.Type" = "list"
-        ,#"Logical.Type" = "logical"
-        ,#"None.Type" = "none"
-        ,#"Null.Type" = "null"
-        ,#"Number.Type" = "number"
-        ,#"Record.Type" = "record"
-        ,#"Table.Type" = "table"
-        ,#"Text.Type" = "text"
-        ,#"Time.Type" = "time"
-        ,#"Type.Type" = "type"]
-   ,simplifyTypeNames = Table.TransformColumns(sortRows,{{"TypeName", each Record.FieldOrDefault(simplifyTypeNameRec,_,_)}})
-   ,selectColumns = Table.SelectColumns(simplifyTypeNames,{"Name", "TypeName","IsNullable"})
-   ,addColOfTypeNames = 
-        Table.AddColumn(
-            selectColumns 
-           ,"TypeNames" 
-           ,each 
-                Expression.Identifier([Name]) 
-              & " = " 
-              & (if [IsNullable] then "nullable " else "") 
-              & [TypeName]
-        )
-   ,tableTypeRec = "[" & Text.Combine(addColOfTypeNames[TypeNames], if vert then "#(lf)," else ", ") & "]" 
+      vert = #"table type is vertical?" ?? false 
+     ,source = Table.Schema(inputTable)
+     ,sortRows = Table.Sort(source,{{"Position", Order.Ascending}})
+     ,simplifyTypeNameRec = 
+          [#"Any.Type" = "any"
+          ,#"Binary.Type" = "binary"
+          ,#"Date.Type" = "date"
+          ,#"DateTime.Type" = "datetime"
+          ,#"DateTimeZone.Type" = "datetimezone"
+          ,#"Duration.Type" = "duration"
+          ,#"Function.Type" = "function"
+          ,#"List.Type" = "list"
+          ,#"Logical.Type" = "logical"
+          ,#"None.Type" = "none"
+          ,#"Null.Type" = "null"
+          ,#"Number.Type" = "number"
+          ,#"Record.Type" = "record"
+          ,#"Table.Type" = "table"
+          ,#"Text.Type" = "text"
+          ,#"Time.Type" = "time"
+          ,#"Type.Type" = "type"]
+     ,simplifyTypeNames = Table.TransformColumns(sortRows,{{"TypeName", each Record.FieldOrDefault(simplifyTypeNameRec,_,_)}})
+     ,selectColumns = Table.SelectColumns(simplifyTypeNames,{"Name", "TypeName","IsNullable"})
+     ,addColOfTypeNames = 
+          Table.AddColumn(
+                selectColumns 
+               ,"TypeNames" 
+               ,each 
+                      Expression.Identifier([Name]) 
+                    & " = " 
+                    & (if [IsNullable] then "nullable " else "") 
+                    & [TypeName]
+          )
+     ,tableTypeRec = "[" & Text.Combine(addColOfTypeNames[TypeNames], if vert then "#(lf)," else ", ") & "]" 
 
-//Code above is based on a function by Chris Webb
+     //Code above is based on a function by Chris Webb
 
-   ,tableOfExpressions = Table.TransformColumns(inputTable,{},Expression.Constant)
-   ,listOfCols = Table.ToColumns(tableOfExpressions)
-   ,listOfColsOfPaddedText = 
-        List.Transform(
-            listOfCols
-           ,(col as list)=>
-                let 
+     ,tableOfExpressions = Table.TransformColumns(inputTable,{},Expression.Constant)
+     ,listOfCols = Table.ToColumns(tableOfExpressions)
+     ,listOfColsOfPaddedText = 
+          List.Transform(
+                listOfCols
+               ,(col as list)=>
+               let 
                     buf = List.Buffer(col),
                     maxTextLength = List.Max(List.Transform(buf,Text.Length)),
                     paddedText = List.Transform(buf,each Text.PadEnd(_,maxTextLength))
                 in
                     paddedText
-        )
-   ,listOfRowsOfPaddedText = List.Zip(listOfColsOfPaddedText)
-   ,bodyAsList = List.Transform(listOfRowsOfPaddedText, (row as list)=> "{"&Text.Combine(row,",")&"}")
-   ,bodyAsText = "{"&Text.Combine(bodyAsList,"#(lf),")&"#(lf)}"
-   ,together =   "#table(type table"
-			   & (if vert then "#(lf)" else "")
+          )
+          ,listOfRowsOfPaddedText = List.Zip(listOfColsOfPaddedText)
+          ,bodyAsList = List.Transform(listOfRowsOfPaddedText, (row as list)=> "{"&Text.Combine(row,",")&"}")
+          ,bodyAsText = "{"&Text.Combine(bodyAsList,"#(lf),")&"#(lf)}"
+          ,together =  
+                 "#table(type table"
+			& (if vert then "#(lf)" else "")
                & tableTypeRec
                & ",#(lf)"
                & bodyAsText
