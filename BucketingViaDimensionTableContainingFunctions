@@ -1,0 +1,39 @@
+(#"Lookup Table"      as table
+,#"Function Column"   as text
+,#"Result Column"     as text) as function =>
+let 
+    TableType = Value.Type(#"Lookup Table")
+    ,FunctionTypeFromTableType = Type.TableColumn(TableType,#"Function Column")
+    ,FunctionTypeFromFirstRow = Value.Type(Record.Field(#"Lookup Table"{0},#"Function Column"))
+    ,FunctionTypeForParameters = 
+        if 
+            (try Type.FunctionParameters(FunctionTypeFromTableType))[HasError] //If function type is abstract...
+        then 
+            FunctionTypeFromFirstRow
+        else 
+            FunctionTypeFromTableType
+    ,FunctionReturnType = Type.TableColumn(TableType,#"Result Column")
+    ,FunctionParameters = Type.FunctionParameters(FunctionTypeForParameters)
+    ,NumberOfRequiredParameters = Type.FunctionRequiredParameters(FunctionTypeForParameters)
+    ,FunctionType = 
+        Type.ForFunction( 
+            [ReturnType = FunctionReturnType
+            ,Parameters = FunctionParameters]
+            ,NumberOfRequiredParameters
+        )
+in 
+    Function.From(
+        FunctionType
+        ,
+        (list as list)=>
+        let
+            //TypeChecking = List.Zip(list,Record.FieldValues(FunctionParameters))
+            //Value = Value.As(#"Lookup Value",FunctionParameterType), //Would be good to add type checking back in
+            LookUpCol = Table.Column(#"Lookup Table",#"Function Column") as list, //List of functions 
+            ResultCol = Table.Column(#"Lookup Table",#"Result Column") as list,
+            Position = List.PositionOf(LookUpCol,list,Occurrence.First,(Func as function,lst as list)=>Function.Invoke(Func,lst)=true),
+            Position2 = if Position = -1 then error "Value not matching with any function" else Position,
+            Result = ResultCol{Position2}
+        in
+            Result
+    )
