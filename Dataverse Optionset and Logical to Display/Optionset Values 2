@@ -1,0 +1,1 @@
+Json.Document(Web.Contents("https://servername.crm6.dynamics.com/api/data/v9.1/stringmaps?$filter=objecttypecode eq 'table name'"))
