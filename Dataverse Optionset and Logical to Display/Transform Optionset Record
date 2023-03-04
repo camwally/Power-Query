@@ -1,0 +1,8 @@
+(#"Optionset Example Value" as record) as table =>
+let
+  Source = #"Optionset Example Value",
+  Custom = Source[value],
+  #"Custom 1" = Table.FromRecords(Custom,{"objecttypecode","attributename","value","displayorder"},MissingField.UseNull),
+  #"Changed column type" = Table.TransformColumnTypes(#"Custom 1", {{"attributename", type text}, {"value", type text}, {"displayorder", type text}, {"objecttypecode", type text}})
+in
+  #"Changed column type"
