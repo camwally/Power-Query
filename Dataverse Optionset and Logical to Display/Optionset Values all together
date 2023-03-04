@@ -1,0 +1,12 @@
+let
+  Source = ListOfTableMetadata,
+  Transform = List.Transform(Source,TransformToTable),
+  Append = Table.Combine(Transform),
+  #"Changed column type" = Table.TransformColumnTypes(Append, {{"displayorder", Int64.Type}}),
+  #"Renamed columns" = Table.RenameColumns(#"Changed column type", {{"objecttypecode", "Table Logical Name"},{"attributename","Column Logical Name"},{"value","Value"},{"displayorder","Order"}}),
+  #"Merged queries" = Table.NestedJoin(#"Renamed columns", {"Table Logical Name","Column Logical Name"}, #"Logical and Display Names", {"Table Logical Name","Column Logical Name"}, "Logical and Display Names", JoinKind.LeftOuter),
+  #"Expanded Logical and Display Names" = Table.ExpandTableColumn(#"Merged queries", "Logical and Display Names", {"Column Display Name"}, {"Column Display Name"}),
+  #"Reordered columns" = Table.ReorderColumns(#"Expanded Logical and Display Names", {"Table Logical Name", "Column Logical Name", "Column Display Name", "Value", "Order"}),
+  #"Sorted rows" = Table.Sort(#"Reordered columns", {{"Table Logical Name", Order.Ascending}, {"Column Logical Name", Order.Ascending}, {"Order", Order.Ascending}})
+in
+  #"Sorted rows"
