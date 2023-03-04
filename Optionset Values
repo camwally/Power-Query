@@ -1,0 +1,1 @@
+Json.Document(Web.Contents("https://orgb0080733.crm6.dynamics.com/api/data/v9.1/stringmaps?$filter=objecttypecode eq 'pmo365_division'"))
