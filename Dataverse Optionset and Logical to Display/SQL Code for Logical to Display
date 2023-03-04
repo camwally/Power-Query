@@ -1,0 +1,48 @@
+SELECT 
+	tb.name as 'Table Logical Name'
+	,tb.DisplayName as 'Table Display Name'
+	,c.name as 'Column Logical Name'
+	,TRIM(c.DisplayName) as 'Column Display Name'
+	,c.column_id as 'Column Id'
+	,ty.name as 'Column Type Name'
+	,c.max_length as 'Column Max Length'
+	,iic.is_first_primary_key as 'Is First Primary Key'
+FROM
+	sys.tables as tb
+INNER JOIN
+	sys.columns as c 
+	ON tb.object_id = c.object_id
+INNER JOIN
+    sys.types as ty 
+	ON 	c.system_type_id = ty.system_type_id
+		AND
+		c.user_type_id = ty.user_type_id
+LEFT JOIN
+(
+	SELECT 
+		i.is_primary_key as is_first_primary_key
+		,ic.object_id
+		,ic.column_id 
+	FROM
+		sys.index_columns ic  
+	INNER JOIN
+		sys.indexes i 
+		ON 	
+			i.object_id = ic.object_id 
+			AND 
+			i.index_id = ic.index_id
+		WHERE 
+			i.is_primary_key = 1
+			AND
+			ic.key_ordinal = 1
+		
+) as iic
+	ON 
+		c.object_id = iic.object_id
+		AND 
+		c.column_id = iic.column_id 
+WHERE
+tb.name IN 
+('tablename1'
+,'tablename2'
+)
