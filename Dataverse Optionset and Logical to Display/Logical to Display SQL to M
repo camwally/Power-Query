@@ -1,0 +1,37 @@
+let
+  Source = SQL,
+  #"Added custom 5" = Table.AddColumn(Source, "Column Display Name if change", each if [Column Logical Name] = [Column Display Name] then null else [Column Display Name], type text),
+  #"Added custom" = Table.AddColumn(#"Added custom 5", "Column Logical Name With Name Suffix", each _[Column Logical Name]&"name", type nullable text),
+  #"Self Join" = Table.NestedJoin(#"Added custom",{"Table Logical Name","Column Logical Name With Name Suffix"},#"Added custom",{"Table Logical Name","Column Logical Name"},"Text Col",JoinKind.LeftOuter),
+  #"Expanded Text Col 1" = Table.ExpandTableColumn(#"Self Join", "Text Col", {"Column Display Name if change"}, {"Column Display Name of Text Version"}),
+  #"Removed columns 3" = Table.RemoveColumns(#"Expanded Text Col 1", {"Column Logical Name With Name Suffix"}),
+  #"Sorted rows 1" = Table.Sort(#"Removed columns 3", {{"Column Id", Order.Ascending}}),
+  #"Added custom 2" = Table.AddColumn(#"Sorted rows 1", "Make Unique", each [Column Display Name of Text Version] & " " & Record.FieldOrDefault([#"uniqueidentifier"="GUID",#"int"="ID",#"bit"="True/False"],[Column Type Name]), type nullable text), 
+  #"Removed columns 1" = Table.RemoveColumns(#"Added custom 2", {"Column Display Name of Text Version"}),
+  #"Added custom 6" = Table.AddColumn(#"Removed columns 1", "Status Columns", each Record.FieldOrDefault([statecode = "Status ID",statecodename = "Status",statuscode = "Status Reason ID",statuscodename = "Status Reason"],[Column Logical Name]), type nullable text),
+  #"Added custom 3" = Table.AddColumn(#"Added custom 6", "Project ID Names", each if [Is First Primary Key] = true then [Table Display Name] & " GUID" else if [Column Display Name] = "Name" then [Table Display Name] else null, type nullable text),
+  #"Renamed columns" = Table.RenameColumns(#"Added custom 3", {{"Column Display Name", "Column Display Name Original"}}),
+  #"Added custom 1" = Table.AddColumn(#"Renamed columns", "Column Display Name", each [Project ID Names] ?? [Status Columns] ?? [Make Unique] ?? [Column Display Name if change], type nullable text),
+  #"Removed columns 2" = Table.RemoveColumns(#"Added custom 1", {"Column Display Name if change", "Make Unique", "Status Columns", "Project ID Names", "Is First Primary Key"}),
+  #"Reordered columns 2" = Table.ReorderColumns(#"Removed columns 2", {"Table Logical Name", "Table Display Name", "Column Logical Name", "Column Display Name Original", "Column Display Name", "Column Id", "Column Type Name", "Column Max Length"}),
+  ColumnType = 
+  type nullable table
+  [ #"Table Logical Name" = nullable text
+  , #"Table Display Name" = nullable text
+  , #"Column Logical Name" = nullable text
+  , #"Column Display Name Original" = nullable text
+  , #"Column Display Name" = nullable text
+  , #"Column Id" = nullable Int64.Type
+  , #"Column Type Name" = nullable text
+  , #"Column Max Length" = nullable Int64.Type
+  ], 
+  #"Grouped rows" = Table.Group(#"Reordered columns 2", {"Table Logical Name", "Column Display Name"}, {{"Column Display Name Count", each Table.RowCount(_), Int64.Type}, {"Table", each _, ColumnType}}),
+  #"Expanded Table" = Table.ExpandTableColumn(#"Grouped rows", "Table", {"Table Display Name", "Column Logical Name", "Column Display Name Original", "Column Id", "Column Type Name", "Column Max Length"}, {"Table Display Name", "Column Logical Name", "Column Display Name Original", "Column Id", "Column Type Name", "Column Max Length"}),
+  #"Reordered columns" = Table.ReorderColumns(#"Expanded Table", {"Table Logical Name", "Table Display Name", "Column Logical Name", "Column Display Name Original", "Column Display Name", "Column Id", "Column Type Name", "Column Max Length","Column Display Name Count"}),
+  #"Added custom 4" = Table.AddColumn(#"Reordered columns", "Custom", each let val = [Column Display Name] in if val = null then null else if [Column Display Name Count] > 1 then val & " (" & [Column Logical Name] & ")" else val, type nullable text),
+  #"Reordered columns 1" = Table.ReorderColumns(#"Added custom 4", {"Custom", "Column Display Name"}),
+  #"Removed columns" = Table.RemoveColumns(#"Reordered columns 1", {"Column Display Name", "Column Display Name Count"}),
+  #"Renamed columns 1" = Table.RenameColumns(#"Removed columns", {{"Custom", "Column Display Name"}}),
+  #"Sorted rows" = Table.Sort(#"Renamed columns 1", {{"Table Logical Name", Order.Ascending}, {"Column Id", Order.Ascending}})
+in
+  #"Sorted rows"
