@@ -1,4 +1,4 @@
 (original as nullable text
 ,old      as nullable text
 ,new      as nullable text) as nullable text =>
-if Text.Upper(original)=Text.Upper(old) = 0 then new else original
+if Text.Upper(original)=Text.Upper(old) then new else original
